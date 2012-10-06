@@ -13,7 +13,7 @@ public class iOSDevice implements Serializable, ModelObject {
     /**
      * Which computer is this connected to?
      */
-    /*package*/ Computer computer;
+    /*package*/ transient Computer computer;
 
     private final Properties props = new Properties();
 
@@ -59,6 +59,10 @@ public class iOSDevice implements Serializable, ModelObject {
         return name; // unmapped
     }
 
+
+    /**
+     * Human readable product name from internal code.
+     */
     private static String[] PRODUCT_TYPE_MAP = {
             "iPhone1,",     "iPhone 3G",
             "iPhone2,",     "iPhone 3GS",
