@@ -1,5 +1,6 @@
 package org.jenkinsci.plugins.iosdevlist;
 
+import hudson.model.Computer;
 import hudson.model.ModelObject;
 
 import java.io.Serializable;
@@ -9,10 +10,20 @@ import java.util.Properties;
  * @author Kohsuke Kawaguchi
  */
 public class iOSDevice implements Serializable, ModelObject {
+    /**
+     * Which computer is this connected to?
+     */
+    /*package*/ Computer computer;
+
     private final Properties props = new Properties();
 
     public iOSDevice(Properties props) {
+        this.computer = computer;
         this.props.putAll(props);
+    }
+
+    public Computer getComputer() {
+        return computer;
     }
 
     public String getDisplayName() {

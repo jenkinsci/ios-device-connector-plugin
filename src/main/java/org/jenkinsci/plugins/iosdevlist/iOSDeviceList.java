@@ -70,7 +70,9 @@ public class iOSDeviceList implements RootAction, ModelObject {
         Multimap<Computer,iOSDevice> devices = LinkedHashMultimap.create();
         for (int i=0; i<computers.length; i++) {
             try {
-                devices.putAll(computers[i],futures.get(i).get());
+                List<iOSDevice> devs = futures.get(i).get();
+                for (iOSDevice d : devs) d.computer = computers[i];
+                devices.putAll(computers[i], devs);
             } catch (Exception e) {
                 e.printStackTrace(listener.error("Failed to list up iOS devices on "+computers[i].getName()));
             }
@@ -85,6 +87,7 @@ public class iOSDeviceList implements RootAction, ModelObject {
         List<iOSDevice> r = Collections.emptyList();
         try {
             r = c.getChannel().call(new FetchTask(listener));
+            for (iOSDevice dev : r) dev.computer = c;
         } catch (Exception e) {
             e.printStackTrace(listener.error("Failed to list up iOS devices"));
         }
@@ -132,6 +135,9 @@ public class iOSDeviceList implements RootAction, ModelObject {
         return null;
     }
 
+    /**
+     * Retrieves {@link iOSDevice}s connected to a machine.
+     */
     private static class FetchTask implements Callable<List<iOSDevice>,IOException> {
         private final TaskListener listener;
 
