@@ -4,7 +4,7 @@ def l = namespace(lib.LayoutTagLib)
 def f = namespace(lib.FormTagLib)
 
 l.layout {
-    def title = my.deviceName
+    def title = "Deploy IPA to ${my.deviceName}"
     l.header(title:title)
     include(my,"sidepanel")
     l.main_panel {
@@ -13,20 +13,12 @@ l.layout {
             text " ${title} (${my.productTypeDisplayName})"
         }
 
-        table(id:"properties", class:"sortable pane bigtable") {
-            tr {
-                th(initialSortDir:"down") {
-                    text _("Name")
-                }
-                th {
-                    text _("Value")
-                }
+        f.form(method:"POST",action:"doDeploy") {
+            f.entry(title:"IPA file to deploy") {
+                input(name:"ipa",type:"file")
             }
-            my.props.each { k,v ->
-                tr {
-                    td k
-                    td v
-                }
+            f.block {
+                    f.submit(value:"Deploy")
             }
         }
     }

@@ -2,8 +2,18 @@ package org.jenkinsci.plugins.iosdevlist;
 
 import hudson.model.Computer;
 import hudson.model.ModelObject;
+import hudson.model.TaskListener;
+import hudson.util.StreamTaskListener;
+import org.kohsuke.stapler.HttpResponse;
+import org.kohsuke.stapler.HttpResponses;
+import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.StaplerResponse;
 
+import javax.servlet.ServletException;
+import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
+import java.io.StringWriter;
 import java.util.Properties;
 
 /**
@@ -18,7 +28,6 @@ public class iOSDevice implements Serializable, ModelObject {
     private final Properties props = new Properties();
 
     public iOSDevice(Properties props) {
-        this.computer = computer;
         this.props.putAll(props);
     }
 
@@ -59,6 +68,28 @@ public class iOSDevice implements Serializable, ModelObject {
         return name; // unmapped
     }
 
+    /**
+     * Deploys the *.ipa file to this device.
+     */
+    public void deploy(File ipa, TaskListener listener) throws IOException, InterruptedException {
+        computer.getChannel().call(new DeployTask(this,ipa,listener));
+    }
+
+    public HttpResponse doDoDeploy(StaplerRequest req) throws IOException {
+        File f = File.createTempFile("jenkins","ipa");
+        StringWriter w = new StringWriter();
+        try {
+            req.getFileItem("ipa").write(f);
+            deploy(f,new StreamTaskListener(w));
+            return HttpResponses.forwardToView(this,"ok");
+        } catch (Exception e) {
+            // failed to deploy
+            throw HttpResponses.error(StaplerResponse.SC_INTERNAL_SERVER_ERROR,
+                    new Error("Failed to deploy app: "+w,e));
+        } finally {
+            f.delete();
+        }
+    }
 
     /**
      * Human readable product name from internal code.
