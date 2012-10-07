@@ -1,5 +1,5 @@
 package org.jenkinsci.plugins.iosdevlist.iOSDevice
-import org.jenkinsci.plugins.iosdevlist.*
+import org.jenkinsci.plugins.iosdevlist.iOSDeviceList
 
 l=namespace(lib.LayoutTagLib)
 

@@ -133,10 +133,13 @@ public class iOSDeviceList implements RootAction, ModelObject {
      * Maps {@link iOSDevice} to URL space.
      */
     public iOSDevice getDynamic(String token) {
-        for (iOSDevice dev : devices.values()) {
-            if (token.equalsIgnoreCase(dev.getUniqueDeviceId()) || token.equals(dev.getDeviceName()))
+        return getDevice(token);
+    }
+
+    public iOSDevice getDevice(String udid) {
+        for (iOSDevice dev : devices.values())
+            if (udid.equalsIgnoreCase(dev.getUniqueDeviceId()) || udid.equals(dev.getDeviceName()))
                 return dev;
-        }
         return null;
     }
 
