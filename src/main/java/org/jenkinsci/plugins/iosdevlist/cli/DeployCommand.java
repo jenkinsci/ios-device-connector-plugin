@@ -1,10 +1,13 @@
-package org.jenkinsci.plugins.iosdevlist;
+package org.jenkinsci.plugins.iosdevlist.cli;
 
 import hudson.AbortException;
+import hudson.Extension;
 import hudson.FilePath;
 import hudson.cli.CLICommand;
 import hudson.model.TaskListener;
 import hudson.util.StreamTaskListener;
+import org.jenkinsci.plugins.iosdevlist.iOSDevice;
+import org.jenkinsci.plugins.iosdevlist.iOSDeviceList;
 import org.kohsuke.args4j.Argument;
 
 import javax.inject.Inject;
@@ -15,7 +18,8 @@ import java.util.List;
 /**
  * CLI command to deploy IPA files.
  */
-public class DeployCLICommand extends CLICommand {
+@Extension
+public class DeployCommand extends CLICommand {
     @Argument(metaVar="DEVICEID",
         usage="Unique device ID or device name",required=true)
     public String device;
@@ -26,6 +30,10 @@ public class DeployCLICommand extends CLICommand {
     @Inject
     iOSDeviceList devices;
 
+    @Override
+    public String getName() {
+        return "ios-deploy-ipa";
+    }
 
     @Override
     public String getShortDescription() {
