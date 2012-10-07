@@ -12,7 +12,7 @@ import java.io.InterruptedIOException;
 import java.util.List;
 
 /**
- * Deploys app.ipa to the device.
+ * Deploys *.ipa to the device.
  *
  * @author Kohsuke Kawaguchi
  */
@@ -42,7 +42,7 @@ class DeployTask implements Callable<Void, IOException> {
             listener.getLogger().println("Extracting "+ipa+" to "+t);
 
             ipa.unzip(new FilePath(t));
-            List<FilePath> payload = ipa.child("Payload").listDirectories();
+            List<FilePath> payload = new FilePath(t).child("Payload").listDirectories();
             if (payload==null || payload.isEmpty())
                 throw new IOException("Malformed IPA file: "+ipa);
             FilePath appDir = payload.get(0);
@@ -57,6 +57,7 @@ class DeployTask implements Callable<Void, IOException> {
             throw (IOException)new InterruptedIOException().initCause(e);
         } finally {
             Util.deleteRecursive(t);
+            listener.getLogger().flush();
         }
     }
 

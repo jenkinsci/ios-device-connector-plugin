@@ -73,6 +73,7 @@ public class iOSDevice implements Serializable, ModelObject {
      */
     public void deploy(File ipa, TaskListener listener) throws IOException, InterruptedException {
         computer.getChannel().call(new DeployTask(this,ipa,listener));
+        computer.getChannel().syncLocalIO();    // TODO: verify if needed
     }
 
     public HttpResponse doDoDeploy(StaplerRequest req) throws IOException {
@@ -81,7 +82,7 @@ public class iOSDevice implements Serializable, ModelObject {
         try {
             req.getFileItem("ipa").write(f);
             deploy(f,new StreamTaskListener(w));
-            return HttpResponses.forwardToView(this,"ok");
+            return HttpResponses.forwardToView(this,"ok").with("msg",w.toString());
         } catch (Exception e) {
             // failed to deploy
             throw HttpResponses.error(StaplerResponse.SC_INTERNAL_SERVER_ERROR,

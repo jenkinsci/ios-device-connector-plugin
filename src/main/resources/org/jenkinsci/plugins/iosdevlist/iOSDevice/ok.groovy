@@ -4,7 +4,7 @@ def l = namespace(lib.LayoutTagLib)
 def f = namespace(lib.FormTagLib)
 
 l.layout {
-    def title = "Deploy IPA to ${my.deviceName}"
+    def title = "App deployed"
     l.header(title:title)
     include(my,"sidepanel")
     l.main_panel {
@@ -13,13 +13,6 @@ l.layout {
             text " ${title} (${my.displayName})"
         }
 
-        f.form(method:"POST",action:"doDeploy") {
-            f.entry(title:"IPA file to deploy") {
-                input(name:"ipa",type:"file")
-            }
-            f.block {
-                    f.submit(value:"Deploy")
-            }
-        }
+        pre msg
     }
 }

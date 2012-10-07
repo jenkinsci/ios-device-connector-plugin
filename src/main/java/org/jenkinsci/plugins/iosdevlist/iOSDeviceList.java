@@ -11,6 +11,8 @@ import hudson.model.ModelObject;
 import hudson.model.RootAction;
 import hudson.model.TaskListener;
 import hudson.remoting.Callable;
+import hudson.security.Permission;
+import hudson.security.PermissionGroup;
 import hudson.util.IOException2;
 import hudson.util.StreamTaskListener;
 import jenkins.model.Jenkins;
@@ -199,4 +201,8 @@ public class iOSDeviceList implements RootAction, ModelObject {
             return r;
         }
     }
+
+    public static final PermissionGroup GROUP = new PermissionGroup(iOSDeviceList.class,Messages._iOSDeviceList_PermissionGroup_Title());
+    public static final Permission READ = new Permission(GROUP,"Read",Messages._iOSDeviceList_ReadPermission(),Jenkins.READ);
+    public static final Permission DEPLOY = new Permission(GROUP,"Deploy",Messages._iOSDeviceList_DeployPermission(),Jenkins.ADMINISTER);
 }
