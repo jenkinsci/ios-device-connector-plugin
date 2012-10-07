@@ -6,6 +6,7 @@ import hudson.FilePath;
 import hudson.cli.CLICommand;
 import hudson.model.TaskListener;
 import hudson.util.StreamTaskListener;
+import jenkins.model.Jenkins;
 import org.jenkinsci.plugins.iosdevlist.iOSDevice;
 import org.jenkinsci.plugins.iosdevlist.iOSDeviceList;
 import org.kohsuke.args4j.Argument;
@@ -42,6 +43,8 @@ public class DeployCommand extends CLICommand {
 
     @Override
     protected int run() throws Exception {
+        Jenkins.getInstance().getInjector().injectMembers(this);
+
         iOSDevice dev = devices.getDevice(device);
         if (dev==null)
             throw new AbortException("No such device found: "+device);
