@@ -1,4 +1,4 @@
-package org.jenkinsci.plugins.iosdevlist;
+package org.jenkinsci.plugins.ios.connector;
 
 import hudson.model.Computer;
 import hudson.model.ModelObject;
@@ -10,7 +10,6 @@ import org.kohsuke.stapler.HttpResponses;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 
-import javax.servlet.ServletException;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;

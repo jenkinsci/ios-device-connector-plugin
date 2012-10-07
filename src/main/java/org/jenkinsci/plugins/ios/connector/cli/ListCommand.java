@@ -1,10 +1,10 @@
-package org.jenkinsci.plugins.iosdevlist.cli;
+package org.jenkinsci.plugins.ios.connector.cli;
 
 import hudson.Extension;
 import hudson.cli.CLICommand;
 import jenkins.model.Jenkins;
-import org.jenkinsci.plugins.iosdevlist.iOSDevice;
-import org.jenkinsci.plugins.iosdevlist.iOSDeviceList;
+import org.jenkinsci.plugins.ios.connector.iOSDevice;
+import org.jenkinsci.plugins.ios.connector.iOSDeviceList;
 
 import javax.inject.Inject;
 

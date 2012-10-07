@@ -1,4 +1,4 @@
-package org.jenkinsci.plugins.iosdevlist;
+package org.jenkinsci.plugins.ios.connector;
 
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;

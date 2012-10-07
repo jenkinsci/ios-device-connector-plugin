@@ -1,4 +1,4 @@
-package org.jenkinsci.plugins.iosdevlist.DeployBuilder
+package org.jenkinsci.plugins.ios.connector.DeployBuilder
 
 def f = namespace(lib.FormTagLib)
 

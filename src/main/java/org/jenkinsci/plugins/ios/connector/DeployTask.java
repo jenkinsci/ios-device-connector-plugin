@@ -1,4 +1,4 @@
-package org.jenkinsci.plugins.iosdevlist;
+package org.jenkinsci.plugins.ios.connector;
 
 import hudson.FilePath;
 import hudson.Launcher.LocalLauncher;

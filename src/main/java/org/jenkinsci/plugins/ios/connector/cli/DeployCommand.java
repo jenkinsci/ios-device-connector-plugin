@@ -1,4 +1,4 @@
-package org.jenkinsci.plugins.iosdevlist.cli;
+package org.jenkinsci.plugins.ios.connector.cli;
 
 import hudson.AbortException;
 import hudson.Extension;
@@ -7,13 +7,12 @@ import hudson.cli.CLICommand;
 import hudson.model.TaskListener;
 import hudson.util.StreamTaskListener;
 import jenkins.model.Jenkins;
-import org.jenkinsci.plugins.iosdevlist.iOSDevice;
-import org.jenkinsci.plugins.iosdevlist.iOSDeviceList;
+import org.jenkinsci.plugins.ios.connector.iOSDevice;
+import org.jenkinsci.plugins.ios.connector.iOSDeviceList;
 import org.kohsuke.args4j.Argument;
 
 import javax.inject.Inject;
 import java.io.File;
-import java.nio.channels.Channel;
 import java.util.List;
 
 /**

@@ -1,4 +1,4 @@
-package org.jenkinsci.plugins.iosdevlist.iOSDeviceList
+package org.jenkinsci.plugins.ios.connector.iOSDeviceList
 
 def l = namespace(lib.LayoutTagLib)
 def f = namespace(lib.FormTagLib)
