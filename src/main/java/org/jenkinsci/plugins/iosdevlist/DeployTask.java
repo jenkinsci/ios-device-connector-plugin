@@ -42,13 +42,14 @@ class DeployTask implements Callable<Void, IOException> {
             listener.getLogger().println("Extracting "+ipa+" to "+t);
 
             ipa.unzip(new FilePath(t));
-            List<FilePath> payload = new FilePath(t).child("Payload").listDirectories();
+            FilePath payloadDir = new FilePath(t).child("Payload");
+            List<FilePath> payload = payloadDir.listDirectories();
             if (payload==null || payload.isEmpty())
                 throw new IOException("Malformed IPA file: "+ipa);
             FilePath appDir = payload.get(0);
 
             int exit = new LocalLauncher(listener).launch().cmds(
-                fruitstrap.getRemote(), "-i", deviceId,"-b",appDir.getRemote()).stdout(listener).join();
+                    fruitstrap.getRemote(), "-i", deviceId, "-b", appDir.getName()).stdout(listener).pwd(payloadDir).join();
             if (exit!=0)
                 throw new IOException("Deployment of "+ipa+" failed: "+exit);
 
