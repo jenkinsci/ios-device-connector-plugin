@@ -4,6 +4,7 @@ import hudson.model.Computer;
 import hudson.model.ModelObject;
 import hudson.model.TaskListener;
 import hudson.util.StreamTaskListener;
+import jenkins.model.Jenkins;
 import org.kohsuke.stapler.HttpResponse;
 import org.kohsuke.stapler.HttpResponses;
 import org.kohsuke.stapler.StaplerRequest;
@@ -72,6 +73,7 @@ public class iOSDevice implements Serializable, ModelObject {
      * Deploys the *.ipa file to this device.
      */
     public void deploy(File ipa, TaskListener listener) throws IOException, InterruptedException {
+        Jenkins.getInstance().checkPermission(iOSDeviceList.DEPLOY);
         computer.getChannel().call(new DeployTask(this,ipa,listener));
         computer.getChannel().syncLocalIO();    // TODO: verify if needed
     }

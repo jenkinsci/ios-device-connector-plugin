@@ -117,7 +117,10 @@ public class iOSDeviceList implements RootAction, ModelObject {
     }
 
     public String getUrlName() {
-        return "ios-devices";
+        if (Jenkins.getInstance().hasPermission(READ))
+            return "ios-devices";
+        else
+            return null;
     }
 
     @RequirePOST
