@@ -87,11 +87,13 @@ public class iOSDeviceList implements RootAction, ModelObject {
         Jenkins.getInstance().checkPermission(Jenkins.ADMINISTER);
 
         List<iOSDevice> r = Collections.emptyList();
-        try {
-            r = c.getChannel().call(new FetchTask(listener));
-            for (iOSDevice dev : r) dev.computer = c;
-        } catch (Exception e) {
-            e.printStackTrace(listener.error("Failed to list up iOS devices"));
+        if (c.isOnline()) {// ignore disabled slaves
+            try {
+                r = c.getChannel().call(new FetchTask(listener));
+                for (iOSDevice dev : r) dev.computer = c;
+            } catch (Exception e) {
+                e.printStackTrace(listener.error("Failed to list up iOS devices"));
+            }
         }
 
         synchronized (this) {
