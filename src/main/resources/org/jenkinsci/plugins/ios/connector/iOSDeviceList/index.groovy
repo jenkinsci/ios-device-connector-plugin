@@ -8,7 +8,7 @@ l.layout {
     l.header(title:title)
     l.main_panel {
         h1 {
-            img(src:"${resURL}/plugin/ios-device-list/icons/48x48/iphone.png",alt:"[!]",height:48,width:48)
+            img(src:"${resURL}/plugin/ios-device-connector/icons/48x48/iphone.png",alt:"[!]",height:48,width:48)
             text " "
             text title
         }
@@ -35,7 +35,7 @@ l.layout {
                 tr {
                     td {
                         a(href:dev.uniqueDeviceId) {
-                            img(src:"${resURL}/plugin/ios-device-list/icons/24x24/iphone.png")
+                            img(src:"${resURL}/plugin/ios-device-connector/icons/24x24/iphone.png")
                         }
                     }
                     td {

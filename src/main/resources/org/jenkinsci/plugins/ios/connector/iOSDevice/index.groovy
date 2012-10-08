@@ -9,7 +9,7 @@ l.layout {
     include(my,"sidepanel")
     l.main_panel {
         h1 {
-            img(src:"${resURL}/plugin/ios-device-list/icons/48x48/iphone.png",alt:"[!]",height:48,width:48)
+            img(src:"${resURL}/plugin/ios-device-connector/icons/48x48/iphone.png",alt:"[!]",height:48,width:48)
             text " ${title} (${my.productTypeDisplayName})"
         }
 

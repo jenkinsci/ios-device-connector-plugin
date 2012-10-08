@@ -109,7 +109,7 @@ public class iOSDeviceList implements RootAction, ModelObject {
     }
 
     public String getIconFileName() {
-        return "/plugin/ios-device-list/icons/24x24/iphone.png";
+        return "/plugin/ios-device-connector/icons/24x24/iphone.png";
     }
 
     public String getDisplayName() {
