@@ -30,10 +30,13 @@ import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.concurrent.Future;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Maps.newHashMap;
 import static hudson.util.jna.GNUCLibrary.*;
 
 /**
@@ -58,25 +61,26 @@ public class iOSDeviceList implements RootAction, ModelObject {
     public void updateAll(TaskListener listener) {
         Jenkins.getInstance().checkPermission(Jenkins.ADMINISTER);
 
-        Computer[] computers = Jenkins.getInstance().getComputers();
-        List<Future<List<iOSDevice>>> futures = newArrayList();
+        Map<Future<List<iOSDevice>>,Computer> futures = newHashMap();
 
-        for (Computer c : computers) {
+        for (Computer c : Jenkins.getInstance().getComputers()) {
             try {
-                futures.add(c.getChannel().callAsync(new FetchTask(listener)));
+                futures.put(c.getChannel().callAsync(new FetchTask(listener)), c);
             } catch (Exception e) {
                 e.printStackTrace(listener.error("Failed to list up iOS devices on"+c.getName()));
             }
         }
 
         Multimap<Computer,iOSDevice> devices = LinkedHashMultimap.create();
-        for (int i=0; i<computers.length; i++) {
+        for (Entry<Future<List<iOSDevice>>, Computer> e : futures.entrySet()) {
+            Computer c = e.getValue();
             try {
-                List<iOSDevice> devs = futures.get(i).get();
-                for (iOSDevice d : devs) d.computer = computers[i];
-                devices.putAll(computers[i], devs);
-            } catch (Exception e) {
-                e.printStackTrace(listener.error("Failed to list up iOS devices on "+computers[i].getName()));
+                List<iOSDevice> devs = e.getKey().get();
+                for (iOSDevice d : devs)
+                    d.computer = c;
+                devices.putAll(c, devs);
+            } catch (Exception x) {
+                x.printStackTrace(listener.error("Failed to list up iOS devices on "+c.getName()));
             }
         }
 
