@@ -69,16 +69,18 @@ public class iOSDevice implements Serializable, ModelObject {
     }
 
     /**
-     * Deploys the *.ipa file to this device.
+     * Deploys a .ipa/app file to this device.
      */
-    public void deploy(File ipa, TaskListener listener) throws IOException, InterruptedException {
+    public void deploy(File bundle, TaskListener listener) throws IOException, InterruptedException {
         Jenkins.getInstance().checkPermission(iOSDeviceList.DEPLOY);
-        computer.getChannel().call(new DeployTask(this,ipa,listener));
+        computer.getChannel().call(new DeployTask(this, bundle, listener));
         computer.getChannel().syncLocalIO();    // TODO: verify if needed
     }
 
     public HttpResponse doDoDeploy(StaplerRequest req) throws IOException {
-        File f = File.createTempFile("jenkins","ipa");
+        // The web interface can only support uploading self-contained .ipa files,
+        // not .app directory bundles, so give the temporary file a .ipa suffix
+        File f = File.createTempFile("jenkins",".ipa");
         StringWriter w = new StringWriter();
         try {
             req.getFileItem("ipa").write(f);

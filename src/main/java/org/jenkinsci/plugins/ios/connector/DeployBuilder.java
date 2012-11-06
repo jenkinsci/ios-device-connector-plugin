@@ -39,16 +39,22 @@ public class DeployBuilder extends Builder {
 
         FilePath ws = build.getWorkspace();
         FilePath[] files = ws.child(path).exists() ? new FilePath[]{ws.child(path)} : ws.list(path);
-        for (FilePath ipa : files) {
-            listener.getLogger().printf("Deploying %s", ipa);
+        if (files.length == 0) {
+            listener.getLogger().println("No iOS apps found to deploy!");
+            return false;
+        }
 
-            File t = File.createTempFile("jenkins", "ipa");
-            try {
-                ipa.copyTo(new FilePath(t));
-                dev.deploy(t,listener);
-            } finally {
-                t.delete();
+        for (FilePath bundle : files) {
+            // Make sure we're being passed an iOS app, in some form
+            String name = bundle.getName();
+            int idx = name.lastIndexOf('.');
+            if (idx < 0) {
+                listener.getLogger().printf("Ignoring '%s'; expected either a .app or .ipa bundle\n", name);
+                continue;
             }
+
+            listener.getLogger().printf("Deploying iOS app: %s\n", name);
+            dev.deploy(new File(bundle.getRemote()), listener);
         }
         return true;
     }

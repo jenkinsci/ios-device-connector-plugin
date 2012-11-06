@@ -24,7 +24,7 @@ public class DeployCommand extends CLICommand {
         usage="Unique device ID or device name",required=true)
     public String device;
 
-    @Argument(index=1,metaVar="IPA",usage="*.ipa files to deploy",required=true)
+    @Argument(index=1,metaVar="BUNDLE",usage="*.ipa/app file(s) to deploy",required=true)
     public List<String> files;
 
     @Inject
@@ -37,7 +37,7 @@ public class DeployCommand extends CLICommand {
 
     @Override
     public String getShortDescription() {
-        return "Deploy IPA files to iOS devices connected to Jenkins";
+        return "Deploy apps to iOS devices connected to Jenkins";
     }
 
     @Override
@@ -49,16 +49,10 @@ public class DeployCommand extends CLICommand {
             throw new AbortException("No such device found: "+device);
 
         TaskListener listener = new StreamTaskListener(stdout,getClientCharset());
-        for (String ipa : files) {
-            FilePath p = new FilePath(checkChannel(),ipa);
-            listener.getLogger().println("Deploying "+ipa);
-            File t = File.createTempFile("jenkins","ipa");
-            try {
-                p.copyTo(new FilePath(t));
-                dev.deploy(t,listener);
-            } finally {
-                t.delete();
-            }
+        for (String bundle : files) {
+            FilePath p = new FilePath(checkChannel(), bundle);
+            listener.getLogger().println("Deploying "+ bundle);
+            dev.deploy(new File(p.getRemote()), listener);
         }
         return 0;
     }
