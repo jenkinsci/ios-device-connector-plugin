@@ -17,16 +17,19 @@ import java.io.File;
 import java.io.IOException;
 
 public class DeployBuilder extends Builder {
+
     public final String udid;
     public final String path;
+    public final String cmdLineArgs;
 
     @Inject
     private transient iOSDeviceList devices;
 
     @DataBoundConstructor
-    public DeployBuilder(String path,String udid) {
+    public DeployBuilder(String path, String udid, String cmdLineArgs) {
         this.path = path;
         this.udid = udid;
+        this.cmdLineArgs = cmdLineArgs;
     }
 
     @Override
@@ -54,7 +57,7 @@ public class DeployBuilder extends Builder {
             }
 
             listener.getLogger().printf("Deploying iOS app: %s\n", name);
-            dev.deploy(new File(bundle.getRemote()), listener);
+            dev.deploy(new File(bundle.getRemote()), cmdLineArgs, listener);
         }
         return true;
     }

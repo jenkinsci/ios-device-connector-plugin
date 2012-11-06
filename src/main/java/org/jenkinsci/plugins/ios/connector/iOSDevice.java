@@ -71,9 +71,9 @@ public class iOSDevice implements Serializable, ModelObject {
     /**
      * Deploys a .ipa/app file to this device.
      */
-    public void deploy(File bundle, TaskListener listener) throws IOException, InterruptedException {
+    public void deploy(File bundle, String cmdLineArgs, TaskListener listener) throws IOException, InterruptedException {
         Jenkins.getInstance().checkPermission(iOSDeviceList.DEPLOY);
-        computer.getChannel().call(new DeployTask(this, bundle, listener));
+        computer.getChannel().call(new DeployTask(this, bundle, cmdLineArgs, listener));
         computer.getChannel().syncLocalIO();    // TODO: verify if needed
     }
 
@@ -84,7 +84,8 @@ public class iOSDevice implements Serializable, ModelObject {
         StringWriter w = new StringWriter();
         try {
             req.getFileItem("ipa").write(f);
-            deploy(f,new StreamTaskListener(w));
+            String args = req.getSubmittedForm().getString("args");
+            deploy(f, args, new StreamTaskListener(w));
             return HttpResponses.forwardToView(this,"ok").with("msg",w.toString());
         } catch (Exception e) {
             // failed to deploy
