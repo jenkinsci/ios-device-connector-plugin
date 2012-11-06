@@ -160,14 +160,14 @@ public class iOSDeviceList implements RootAction, ModelObject {
         }
 
         public List<iOSDevice> call() throws IOException {
-            try {
-                if (!Platform.isMac())
-                    return Collections.emptyList();
+            if (!Platform.isMac())
+                return Collections.emptyList();
 
+            File exe = File.createTempFile("ios","list");
+            try {
                 PrintStream logger = listener.getLogger();
                 logger.println("Listing up iOS Devices");
 
-                File exe = File.createTempFile("ios","list");
                 FileUtils.copyURLToFile(getClass().getResource("list"),exe);
                 LIBC.chmod(exe.getAbsolutePath(),0755);
 
@@ -183,6 +183,8 @@ public class iOSDeviceList implements RootAction, ModelObject {
                 return parseOutput(logger, out);
             } catch (InterruptedException e) {
                 throw new IOException2("Interrupted while listing up devices",e);
+            } finally {
+                exe.delete();
             }
         }
 
