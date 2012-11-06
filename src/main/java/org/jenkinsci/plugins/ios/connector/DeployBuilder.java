@@ -4,6 +4,7 @@ import hudson.AbortException;
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
+import hudson.Util;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
 import hudson.model.BuildListener;
@@ -15,6 +16,7 @@ import org.kohsuke.stapler.DataBoundConstructor;
 import javax.inject.Inject;
 import java.io.File;
 import java.io.IOException;
+import java.util.Map;
 
 public class DeployBuilder extends Builder {
 
@@ -36,9 +38,14 @@ public class DeployBuilder extends Builder {
     public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener) throws InterruptedException, IOException {
         Jenkins.getInstance().getInjector().injectMembers(this);
 
-        iOSDevice dev = devices.getDevice(udid);
-        if (dev==null)
-            throw new AbortException("No such device: "+udid);
+        // Expand matrix and build variables in the device ID and command line args
+        final String device = expandVariables(build, listener, udid);
+        final String args = expandVariables(build, listener, cmdLineArgs);
+
+        iOSDevice dev = devices.getDevice(device);
+        if (dev == null) {
+            throw new AbortException("No such device: "+device);
+        }
 
         FilePath ws = build.getWorkspace();
         FilePath[] files = ws.child(path).exists() ? new FilePath[]{ws.child(path)} : ws.list(path);
@@ -57,9 +64,26 @@ public class DeployBuilder extends Builder {
             }
 
             listener.getLogger().printf("Deploying iOS app: %s\n", name);
-            dev.deploy(new File(bundle.getRemote()), cmdLineArgs, listener);
+            dev.deploy(new File(bundle.getRemote()), args, listener);
         }
         return true;
+    }
+
+    private static String expandVariables(AbstractBuild<?, ?> build, BuildListener listener, String token) {
+        Map<String, String> vars = build.getBuildVariables();
+        try {
+            vars.putAll(build.getEnvironment(listener));
+        } catch (IOException e) {
+            return null;
+        } catch (InterruptedException e) {
+            return null;
+        }
+
+        String result = Util.fixEmptyAndTrim(token);
+        if (result != null) {
+            result = Util.replaceMacro(result, vars);
+        }
+        return result;
     }
 
     @Extension
