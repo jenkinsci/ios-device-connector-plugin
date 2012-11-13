@@ -20,6 +20,10 @@ import java.util.Properties;
  * @author Kohsuke Kawaguchi
  */
 public class iOSDevice implements Serializable, ModelObject {
+
+    /** Device property key: product type. */
+    static final String PROP_PRODUCT_TYPE = "ProductType";
+
     /**
      * Which computer is this connected to?
      */
@@ -60,7 +64,7 @@ public class iOSDevice implements Serializable, ModelObject {
      * such as "iPhone 3GS", etc.
      */
     public String getProductTypeDisplayName() {
-        String name = props.getProperty("ProductType");
+        String name = props.getProperty(PROP_PRODUCT_TYPE);
         for (int i=0; i<PRODUCT_TYPE_MAP.length; i+=2) {
             if (name.startsWith(PRODUCT_TYPE_MAP[i]))
                 return PRODUCT_TYPE_MAP[i+1];
@@ -104,8 +108,20 @@ public class iOSDevice implements Serializable, ModelObject {
             "iPhone5,",     "iPhone 5",
 
             "iPad1,",       "iPad 1",
+            "iPad2,5",      "iPad mini",
+            "iPad2,6",      "iPad mini",
+            "iPad2,7",      "iPad mini",
             "iPad2,",       "iPad 2",
-            "iPad3,",       "iPad 3"
+            "iPad3,4",      "iPad 4",
+            "iPad3,5",      "iPad 4",
+            "iPad3,6",      "iPad 4",
+            "iPad3,",       "iPad 3",
+
+            "iPod1,",       "iPod 1G",
+            "iPod2,",       "iPod 2G",
+            "iPod3,",       "iPod 3G",
+            "iPod4,",       "iPod 4G",
+            "iPod5,",       "iPod 5G"
     };
 
     private static final long serialVersionUID = 1L;
