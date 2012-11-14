@@ -21,14 +21,12 @@ import java.util.List;
 class DeployTask implements Callable<Void, IOException> {
 
     private final FilePath bundle;
-    private final String cmdLineArgs;
     private final TaskListener listener;
     private final String deviceId;
     private final FilePath rootPath;
 
-    DeployTask(iOSDevice device, File bundle, String cmdLineArgs, TaskListener listener) {
+    DeployTask(iOSDevice device, File bundle, TaskListener listener) {
         this.bundle = new FilePath(bundle);
-        this.cmdLineArgs = cmdLineArgs;
         this.listener = listener;
         this.deviceId = device.getUniqueDeviceId();
         this.rootPath = device.getComputer().getNode().getRootPath();
@@ -67,7 +65,6 @@ class DeployTask implements Callable<Void, IOException> {
 
             ArgumentListBuilder arguments = new ArgumentListBuilder(fruitstrap.getRemote());
             arguments.add("--id", deviceId, "--bundle", appDir.getName());
-            arguments.addTokenized(cmdLineArgs);
 
             ProcStarter proc = new LocalLauncher(listener).launch()
                     .cmds(arguments)

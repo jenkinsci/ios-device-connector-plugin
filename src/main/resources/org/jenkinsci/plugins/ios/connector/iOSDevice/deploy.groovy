@@ -10,16 +10,12 @@ l.layout {
     l.main_panel {
         h1 {
             img(src:"${resURL}/plugin/ios-device-connector/icons/48x48/iphone.png",alt:"[!]",height:48,width:48)
-            text " ${title} (${my.productTypeDisplayName})"
+            text " ${title} (${my.displayName})"
         }
 
         f.form(method:"POST",action:"doDeploy") {
             f.entry(title:"IPA file to deploy") {
                 input(name:"ipa",type:"file")
-            }
-            f.entry(title:"Fruitstrap args",
-                    description:"Command line arguments which will be passed to the <tt>fruitstrap</tt> command") {
-                f.textbox(name:"args")
             }
             f.block {
                     f.submit(value:"Deploy")
