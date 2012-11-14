@@ -4,6 +4,7 @@ import hudson.AbortException;
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
+import hudson.Util;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
 import hudson.model.BuildListener;
@@ -15,6 +16,7 @@ import org.kohsuke.stapler.DataBoundConstructor;
 import javax.inject.Inject;
 import java.io.File;
 import java.io.IOException;
+import java.util.Map;
 
 public class DeployBuilder extends Builder {
     public final String udid;
@@ -33,24 +35,51 @@ public class DeployBuilder extends Builder {
     public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener) throws InterruptedException, IOException {
         Jenkins.getInstance().getInjector().injectMembers(this);
 
-        iOSDevice dev = devices.getDevice(udid);
-        if (dev==null)
-            throw new AbortException("No such device: "+udid);
+        // Expand matrix and build variables in the device ID and command line args
+        final String device = expandVariables(build, listener, udid);
+
+        iOSDevice dev = devices.getDevice(device);
+        if (dev == null) {
+            throw new AbortException("No such device: "+device);
+        }
 
         FilePath ws = build.getWorkspace();
         FilePath[] files = ws.child(path).exists() ? new FilePath[]{ws.child(path)} : ws.list(path);
-        for (FilePath ipa : files) {
-            listener.getLogger().printf("Deploying %s", ipa);
+        if (files.length == 0) {
+            listener.getLogger().println("No iOS apps found to deploy!");
+            return false;
+        }
 
-            File t = File.createTempFile("jenkins", "ipa");
-            try {
-                ipa.copyTo(new FilePath(t));
-                dev.deploy(t,listener);
-            } finally {
-                t.delete();
+        for (FilePath bundle : files) {
+            // Make sure we're being passed an iOS app, in some form
+            String name = bundle.getName();
+            int idx = name.lastIndexOf('.');
+            if (idx < 0) {
+                listener.getLogger().printf("Ignoring '%s'; expected either a .app or .ipa bundle\n", name);
+                continue;
             }
+
+            listener.getLogger().printf("Deploying iOS app: %s\n", name);
+            dev.deploy(new File(bundle.getRemote()), listener);
         }
         return true;
+    }
+
+    private static String expandVariables(AbstractBuild<?, ?> build, BuildListener listener, String token) {
+        Map<String, String> vars = build.getBuildVariables();
+        try {
+            vars.putAll(build.getEnvironment(listener));
+        } catch (IOException e) {
+            return null;
+        } catch (InterruptedException e) {
+            return null;
+        }
+
+        String result = Util.fixEmptyAndTrim(token);
+        if (result != null) {
+            result = Util.replaceMacro(result, vars);
+        }
+        return result;
     }
 
     @Extension
