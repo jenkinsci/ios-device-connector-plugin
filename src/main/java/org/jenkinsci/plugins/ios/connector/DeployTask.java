@@ -2,9 +2,11 @@ package org.jenkinsci.plugins.ios.connector;
 
 import hudson.FilePath;
 import hudson.Launcher.LocalLauncher;
+import hudson.Launcher.ProcStarter;
 import hudson.Util;
 import hudson.model.TaskListener;
 import hudson.remoting.Callable;
+import hudson.util.ArgumentListBuilder;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,13 +19,16 @@ import java.util.List;
  * @author Kohsuke Kawaguchi
  */
 class DeployTask implements Callable<Void, IOException> {
-    private final FilePath ipa;
+
+    private final FilePath bundle;
+    private final String cmdLineArgs;
     private final TaskListener listener;
     private final String deviceId;
     private final FilePath rootPath;
 
-    DeployTask(iOSDevice device, File ipa, TaskListener listener) {
-        this.ipa = new FilePath(ipa);
+    DeployTask(iOSDevice device, File bundle, String cmdLineArgs, TaskListener listener) {
+        this.bundle = new FilePath(bundle);
+        this.cmdLineArgs = cmdLineArgs;
         this.listener = listener;
         this.deviceId = device.getUniqueDeviceId();
         this.rootPath = device.getComputer().getNode().getRootPath();
@@ -39,19 +44,38 @@ class DeployTask implements Callable<Void, IOException> {
                 fruitstrap.chmod(0755);
             }
 
-            listener.getLogger().println("Extracting "+ipa+" to "+t);
+            listener.getLogger().println("Copying "+ bundle +" to "+ t);
 
-            ipa.unzip(new FilePath(t));
-            FilePath payloadDir = new FilePath(t).child("Payload");
-            List<FilePath> payload = payloadDir.listDirectories();
-            if (payload==null || payload.isEmpty())
-                throw new IOException("Malformed IPA file: "+ipa);
-            FilePath appDir = payload.get(0);
+            // Determine what type of file was passed
+            FilePath appDir;
+            FilePath tmpDir = new FilePath(t);
+            final String filename = bundle.getName();
+            if (filename.toLowerCase().endsWith(".ipa")) {
+                listener.getLogger().println("Extracting .app from .ipa file...");
+                bundle.unzip(tmpDir);
+                FilePath payloadDir = tmpDir.child("Payload");
+                List<FilePath> payload = payloadDir.listDirectories();
+                if (payload==null || payload.isEmpty())
+                    throw new IOException("Malformed IPA file: "+bundle);
+                appDir = payload.get(0);
+            } else if (filename.toLowerCase().endsWith(".app")) {
+                appDir = tmpDir.child(filename);
+                bundle.copyRecursiveTo(appDir);
+            } else {
+                throw new IOException("Expected either a .app or .ipa bundle!");
+            }
 
-            int exit = new LocalLauncher(listener).launch().cmds(
-                    fruitstrap.getRemote(), "-i", deviceId, "-b", appDir.getName()).stdout(listener).pwd(payloadDir).join();
+            ArgumentListBuilder arguments = new ArgumentListBuilder(fruitstrap.getRemote());
+            arguments.add("--id", deviceId, "--bundle", appDir.getName());
+            arguments.addTokenized(cmdLineArgs);
+
+            ProcStarter proc = new LocalLauncher(listener).launch()
+                    .cmds(arguments)
+                    .stdout(listener)
+                    .pwd(appDir.getParent());
+            int exit = proc.join();
             if (exit!=0)
-                throw new IOException("Deployment of "+ipa+" failed: "+exit);
+                throw new IOException("Deployment of "+bundle+" failed: "+exit);
 
             return null;
         } catch (InterruptedException e) {
