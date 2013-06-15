@@ -88,7 +88,11 @@ public class iOSDeviceList implements RootAction, ModelObject {
     }
 
     public void update(Computer c, TaskListener listener) {
-        Jenkins.getInstance().checkPermission(Jenkins.ADMINISTER);
+        if (!Jenkins.getInstance().hasPermission(Jenkins.READ)) {
+            listener.getLogger().println("This node does not have read permission; " +
+                "this is required to check for connected iOS devices.");
+            return;
+        }
 
         List<iOSDevice> r = Collections.emptyList();
         if (c.isOnline()) {// ignore disabled slaves
