@@ -28,6 +28,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
+import java.nio.file.Files;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -163,7 +164,7 @@ public class iOSDeviceList implements RootAction, ModelObject {
             if (!Platform.isMac())
                 return Collections.emptyList();
 
-            File exe = File.createTempFile("ios","list");
+            File exe = Files.createTempFile("ios", "list").toFile();
             try {
                 PrintStream logger = listener.getLogger();
                 logger.println("Listing up iOS Devices");
