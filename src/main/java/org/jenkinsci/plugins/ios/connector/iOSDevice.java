@@ -14,6 +14,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.io.StringWriter;
+import java.nio.file.Files;
 import java.util.Properties;
 
 /**
@@ -84,7 +85,7 @@ public class iOSDevice implements Serializable, ModelObject {
     public HttpResponse doDoDeploy(StaplerRequest req) throws IOException {
         // The web interface can only support uploading self-contained .ipa files,
         // not .app directory bundles, so give the temporary file a .ipa suffix
-        File f = File.createTempFile("jenkins",".ipa");
+        File f = Files.createTempFile("jenkins", ".ipa").toFile();
         StringWriter w = new StringWriter();
         try {
             req.getFileItem("ipa").write(f);
